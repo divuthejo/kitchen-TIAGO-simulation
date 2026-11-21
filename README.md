@@ -1,8 +1,7 @@
 # TIAGo kitchen pick-and-place (Webots R2025a)
 
 The Webots `kitchen.wbt` sample with a PAL TIAGo that moves the three jars from the counter to the table,
-plus a PS4 teleop mode. Jar and cereal-box positions are unchanged (only recognition colours added).
-
+plus a PS4 teleop mode. 
 ## Run
 
 ```bash
@@ -20,8 +19,7 @@ webots worlds/kitchen_tiago_teleop.wbt   # drive it yourself with a PS4 pad (or 
   until the path is clear; steers around obstacles in the middle of the path (the table outline is added
   as a known obstacle because the scanner only sees its legs).
 - **PS4 teleop** (`controllers/tiago_ps4`): see the docstring at the top of the file for the controls.
-- **Cereal boxes**: implemented but off by default (`CEREAL_ENABLED` in `tiago_auto.py`) - the 1 kg boxes
-  twist out of the small finger pads during transport.
+  
 
 ## Robot changes (`protos/`)
 
