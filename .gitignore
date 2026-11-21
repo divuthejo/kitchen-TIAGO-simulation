@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+# Webots per-user view state
+worlds/.*.wbproj
+# runtime logs written by the controllers
+controllers/tiago_ps4/tiago_ps4.log
+controllers/tiago_ps4/joy_debug.log
