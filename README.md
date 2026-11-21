@@ -1,3 +1,6 @@
+
+<img width="1225" height="637" alt="kitchen_tiago_teleop_1" src="https://github.com/user-attachments/assets/975a91ce-471d-40d0-96d7-d40b66f46932" />
+<img width="1225" height="637" alt="kitchen_tiago_teleop" src="https://github.com/user-attachments/assets/2b2b30c6-d9f8-47e7-9760-5b9fe68c8c0d" />
 # TIAGo kitchen pick-and-place (Webots R2025a)
 
 The Webots `kitchen.wbt` sample with a PAL TIAGo that moves the three jars from the counter to the table,
