@@ -4,8 +4,8 @@ Controls (PS4, Linux hid-sony layout; run with DEBUG_JOY=True to check your indi
   Left stick Y ........ drive forward / back
   Right stick X ....... turn
   D-pad up / down ..... torso lift up / down (the "lift joint")
-  R2 (hold) ........... close gripper; keep holding to squeeze harder
-                        -> squeeze force ramps up but STOPS at GRIP_FORCE_LIMIT
+  R2 (tap or hold) .... close gripper; once both pads touch it holds at GRIP_HOLD (8 N) by itself;
+                        keep holding R2 to squeeze harder -> ramps up but STOPS at GRIP_FORCE_LIMIT
   L2 .................. open gripper (releases, resets squeeze force)
   Triangle ............ arm preset "reach" (gripper level, 1.09 m ahead - grasp / place)
   Square .............. arm preset "carry" (gripper level, 0.77 m ahead - drive with a jar)
@@ -39,6 +39,8 @@ from lidar_guard import LidarGuard  # noqa: E402
 # ---------------------------------------------------------------- tuning
 GRIP_FORCE_LIMIT = 10.0   # N  safety threshold (finger motor max is 16 N)
 GRIP_FORCE_START = 2.0    # N  force when you first press R2 (fingers close gently)
+GRIP_HOLD = 8.0           # N  automatic squeeze as soon as both pads touch (a 0.5 kg jar needs ~2.5 N/pad
+                          #    just to hang; a short tap of R2 used to leave it at 2-4 N and it slipped out)
 GRIP_FORCE_RATE = 4.0     # N/s squeeze increase while R2 is held
 SLIP_RATIO = 0.6          # pad shear/normal above this = object starting to slip
 ARM_RATE = 0.5            # rad/s for the fastest joint during a preset move
@@ -99,7 +101,8 @@ arm_sensors = [dev(n + '_sensor') for n in ARM]
 fingers = [dev('gripper_left_finger_joint'), dev('gripper_right_finger_joint')]
 finger_sensors = [dev('gripper_left_sensor_finger_joint'), dev('gripper_right_sensor_finger_joint')]
 FINGER_MAX_FORCE = fingers[0].getMaxForce()
-FINGER_OPEN = fingers[0].getMaxPosition()   # 0.06 with TiagoGripperWide (12 cm opening)
+FINGER_MAX = fingers[0].getMaxPosition()    # 0.12 with TiagoGripperWide (24 cm, for the cereal boxes)
+FINGER_OPEN = min(0.06, FINGER_MAX)          # open to 12 cm: plenty for the 9 cm jars, and closes fast
 for s in [torso_sensor] + arm_sensors + finger_sensors:
     s.enable(dt_ms)
 for f in fingers:
@@ -355,6 +358,11 @@ while robot.step(dt_ms) != -1:
                 rumble(0.30)   # short rumble where the pad supports it
 
     if grip_closing:
+        if tac.ok and tac.both_touching and grip_force_cmd < GRIP_HOLD:
+            # auto-hold: both pads touch -> go straight to a safe squeeze, even if R2 was only tapped
+            grip_force_cmd = GRIP_HOLD
+            print(f'[tiago_ps4] TACTILE: both pads touching - holding at {GRIP_HOLD:.0f} N '
+                  f'(hold R2 to squeeze up to {GRIP_FORCE_LIMIT:.0f} N)')
         if tac.ok and tac.both_touching:
             # slip reflex: tighten on its own while the object slides, still capped by the limit
             if tac.slip > SLIP_RATIO and not at_limit:
